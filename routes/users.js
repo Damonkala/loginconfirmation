@@ -4,7 +4,7 @@ var express = require('express');
 var router = express.Router();
 
 var User = require('../models/user');
-
+var conf = Math.floor(Math.random()*90000) + 10000;
 // USERS
 
 // register a new user
@@ -14,7 +14,13 @@ router.post('/register', function(req, res) {
   });
 });
 router.put('/confirm', function(req, res) {
-  User.findOneAndUpdate({code: req.body.code}, {$set:{confirmed: true}},
+  User.findOneAndUpdate({code: req.body.code}, {$set:{confirmed: true, code: null} },
+    function(err, data){
+      console.log(data);
+    })
+});
+router.put('/reset', function(req, res) {
+  User.findOneAndUpdate({phone: req.body.phone}, {$set:{code: conf} },
     function(err, data){
       console.log(data);
     })

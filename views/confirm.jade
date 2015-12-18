@@ -1,0 +1,15 @@
+extends ./layout
+
+block css
+  link(href='css/style.css', rel='stylesheet')
+
+block content
+  .container
+    div
+      .form-group
+        label(for='sc') Secret Code
+        input#sc.form-control(type='text', placeholder='Secret Code')
+      button.btn.btn-default#confirm Confirm
+
+block js
+  script(src='js/confirm.js')

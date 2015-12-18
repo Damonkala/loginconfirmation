@@ -9,8 +9,8 @@ var conf = Math.floor(Math.random()*90000) + 10000;
 
 var User;
 // Twilio Credentials
-var accountSid = 'AC7f5aff252fbfb619877510a50882b0e9';
-var authToken = '116db4eefdabc7d5c5e835f6004e34ed';
+var accountSid = process.env.TWILIO_ACCOUNT_SID;
+var authToken = process.env.TWILIO_AUTH_TOKEN;
 
 //require the Twilio module and create a REST client
 var client = require('twilio')(accountSid, authToken);
@@ -19,7 +19,7 @@ var userSchema = Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   confirmed: { type: Boolean, required: true, default: false},
-  phone: {type: String, required: true},
+  email: {type: String, required: true},
   code: {type: String}
 });
 
@@ -36,7 +36,7 @@ userSchema.methods.token = function() {
 userSchema.statics.register = function(user, cb) {
   var username = user.username;
   var password = user.password;
-  var phone = user.phone;
+  var email = user.email;
   User.findOne({username: username}, function(err, user){
     if(err || user) return cb(err || 'Username already taken.');
     bcrypt.genSalt(13, function(err1, salt) {
@@ -45,19 +45,25 @@ userSchema.statics.register = function(user, cb) {
         var newUser = new User();
         var code = conf.toString();
         newUser.code = code;
-        newUser.phone = phone;
+        newUser.email = email;
         newUser.username = username;
         newUser.password = hash;
         newUser.save(function(err, savedUser){
           savedUser.password = null;
           cb(err, savedUser);
-          client.messages.create({
-            to: savedUser.phone,
-          	from: "+14088161071",
-            body: code,
-          }, function(err, message) {
-          	console.log(message.sid);
-          });
+          var api_key = process.env.MAIL_GUN;
+          var domain = 'sandboxae4b6160407b4aa698c767cdd0318533.mailgun.org';
+          var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+          var data = {
+            from: 'Excited User <me@samples.mailgun.org>',
+            to: savedUser.email,
+            subject: 'Welcome',
+            text: "You're secret code is:", code
+          };
+
+mailgun.messages().send(data, function (error, body) {
+  console.log(body);
+});
         });
       });
     });

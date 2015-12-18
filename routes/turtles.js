@@ -3,7 +3,7 @@
 var express = require('express');
 var router = express.Router();
 
-var authMiddleware = require('../config/auth');
+var authMiddleware = require('../config/confirmed');
 
 router.get('/', authMiddleware, function(req, res) {
   console.log(req.user)
