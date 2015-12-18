@@ -9,8 +9,7 @@ var conf = Math.floor(Math.random()*90000) + 10000;
 
 var User;
 // Twilio Credentials
-var accountSid = 'AC7f5aff252fbfb619877510a50882b0e9';
-var authToken = '116db4eefdabc7d5c5e835f6004e34ed';
+
 
 //require the Twilio module and create a REST client
 var client = require('twilio')(accountSid, authToken);
